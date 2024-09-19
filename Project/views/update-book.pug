@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  h1 Edit Book Details
+  form(action=`/books/${book.id}` method="POST")
+    label(for="title") Title
+    input(type="text" name="title" value=book.title required)
+    label(for="author") Author
+    input(type="text" name="author" value=book.author required)
+    button(type="submit") Update Book

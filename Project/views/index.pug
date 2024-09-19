@@ -1,5 +1,8 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  h1 All Books
+  ul
+    each book in books
+      li
+        a(href=`/books/${book.id}`) #{book.title} - #{book.author}

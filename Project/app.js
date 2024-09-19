@@ -57,6 +57,92 @@ app.use((err, req, res, next) => {
   res.status(err.status);
   res.render('error', { err });
 });
+// Home route
+app.get('/', (req, res) => {
+  res.redirect('/books');
+});
+// book Route
+app.get('/books', async (req, res) => {
+  try {
+      const books = await Book.findAll(); // Assuming you have a Book model
+      res.render('index', { books });
+  } catch (error) {
+      next(error); // Pass to global error handler
+  }
+});
+//New Book Route
+app.get('/books/new', (req, res) => {
+  res.render('new-book');
+});
+// Post a new book to the database
+app.post('/books/new', async (req, res, next) => {
+  try {
+      await Book.create(req.body); // Assumes a `Book` model exists
+      res.redirect('/books');
+  } catch (error) {
+      next(error);
+  }
+});
+//Book detail Route
+app.get('/books/:id', async (req, res, next) => {
+  try {
+      const book = await Book.findByPk(req.params.id);
+      if (book) {
+          res.render('update-book', { book });
+      } else {
+          res.status(404).render('page-not-found');
+      }
+  } catch (error) {
+      next(error);
+  }
+});
+//Update book route
+app.post('/books/:id', async (req, res, next) => {
+  try {
+      const book = await Book.findByPk(req.params.id);
+      if (book) {
+          await book.update(req.body);
+          res.redirect('/books');
+      } else {
+          res.status(404).render('page-not-found');
+      }
+  } catch (error) {
+      next(error);
+  }
+});
+//Delete Book Route
+app.post('/books/:id/delete', async (req, res, next) => {
+  try {
+      const book = await Book.findByPk(req.params.id);
+      if (book) {
+          await book.destroy();
+          res.redirect('/books');
+      } else {
+          res.status(404).render('page-not-found');
+      }
+  } catch (error) {
+      next(error);
+  }
+});
+//Form error 
 
+
+app.post('/submit-form',async (req, res, next) => {
+  try {
+    // Create a new book instance
+    const book = await Book.create({ title, author });
+    // Redirect to the books listing page if successful
+    res.redirect('/books');
+  } catch (error) {
+    // Render form with error messages
+    if (error.name === 'SequelizeValidationError') {
+      const errors = error.errors.map(err => err.message);
+      res.render('form-error', { errors }); // Pass errors to your form-error.html template
+    } else {
+      // Handle other errors
+      res.status(500).send('Server Error');
+    }
+  }
+});
 
 module.exports = app;

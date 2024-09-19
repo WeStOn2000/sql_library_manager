@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  h1 Add New Book
+  form(action="/books/new" method="POST")
+    label(for="title") Title
+    input(type="text" name="title" required)
+    label(for="author") Author
+    input(type="text" name="author" required)
+    button(type="submit") Add Book
