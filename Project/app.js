@@ -1,4 +1,3 @@
-var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 const db = require('./models/index');
@@ -23,20 +22,41 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+
+// Handle 404 errors and render the 'page-not-found' template
+app.use((req, res, next) => {
+  const error = new Error("Page not found");
+  error.status = 404;
+  next(error); // Pass the error to the error-handling middleware
 });
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+// Error-handling middleware
+app.use((error, req, res, next) => {
+  res.status(error.status || 500);
+  // Render the 'page-not-found' template for 404 errors, passing the error message
+  if (error.status === 404) {
+      res.render('page-not-found', { error });
+  } else {
+      // Handle other types of errors with a different template or error page
+      res.render('error', { error });
+  }
 });
+
+// Global error handler
+app.use((err, req, res, next) => {
+  // Set the status to 500 if it's not already set
+  err.status = err.status || 500;
+
+  // Set a default user-friendly message if it's not already set
+  err.message = err.message || "Oops! Something went wrong on the server.";
+
+  // Log the error status and message to the console
+  console.error(`Error Status: ${err.status}, Message: ${err.message}`);
+
+  // Render the error template and pass the error object
+  res.status(err.status);
+  res.render('error', { err });
+});
+
 
 module.exports = app;
