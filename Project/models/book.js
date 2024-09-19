@@ -1,4 +1,6 @@
 'use strict';
+
+const sequelize = require('../models');
 const {
   Model
 } = require('sequelize');
@@ -48,7 +50,6 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-  }, 
     sequelize,
     modelName: 'Book',
   });
