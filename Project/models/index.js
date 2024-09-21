@@ -37,6 +37,20 @@ Object.keys(db).forEach(modelName => {
   }
 });
 
+(async () => {
+    try {
+        await sequelize.authenticate();
+        console.log('Connection has been established successfully.');
+
+        await sequelize.sync();
+        console.log('Database synchronized successfully.');
+    } catch (error) {
+        console.error('Unable to connect to the database:', error);
+    }
+})();
+
+module.exports = sequelize;
+
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 

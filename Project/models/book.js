@@ -1,7 +1,7 @@
 'use strict';
 
-const { Model, DataTypes } = require('sequelize');  // Import Model and DataTypes
-const sequelize = require('../config/db');  // Import the configured sequelize instance
+const { Model, DataTypes } = require('sequelize');
+const sequelize = require('../models/index.js'); 
 
 module.exports = (sequelize, DataTypes) => {
   class Book extends Model {
@@ -14,8 +14,6 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-
-  // Initialize the Book model
   Book.init(
     {
       title: {
@@ -54,8 +52,8 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
-      sequelize,  // Only pass the sequelize instance here
-      modelName: 'Book',  // Set the model name
+      sequelize, 
+      modelName: 'Book', 
     }
   );
 
