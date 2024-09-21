@@ -122,7 +122,7 @@ app.post('/books/:id', async (req, res, next) => {
       if (error.name === 'SequelizeValidationError') {
           res.render('update-book', {
               errors: error.errors,
-              book: { ...req.body, id: req.params.id } // Keep form data
+              book: { ...req.body, id: req.params.id } 
           });
       } else {
           next(error);
@@ -148,15 +148,15 @@ app.post('/books/:id/delete', async (req, res, next) => {
 app.post('/submit-form',async (req, res, next) => {
   try {
     const book = await Book.create({ title, author });
-    // Redirect to the books listing page if successful
+    
     res.redirect('/books');
   } catch (error) {
-    // Render form with error messages
+
     if (error.name === 'SequelizeValidationError') {
       const errors = error.errors.map(err => err.message);
-      res.render('form-error', { errors }); // Pass errors to your form-error.html template
+      res.render('form-error', { errors }); 
     } else {
-      // Handle other errors
+    
       res.status(500).send('Server Error');
     }
   }
