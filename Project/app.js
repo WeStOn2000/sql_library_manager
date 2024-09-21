@@ -3,6 +3,7 @@ var path = require('path');
 const db = require('./models/index');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const book = require('./models/book');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -23,34 +24,36 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 
+
+
 // Handle 404 errors and render the 'page-not-found' template
 app.use((req, res, next) => {
   const error = new Error("Page not found");
   error.status = 404;
-  next(error); // Pass the error to the error-handling middleware
+  next(error); 
 });
 
 // Error-handling middleware
 app.use((error, req, res, next) => {
   res.status(error.status || 500);
-  // Render the 'page-not-found' template for 404 errors, passing the error message
+  //passing the error message
   if (error.status === 404) {
       res.render('page-not-found', { error });
   } else {
-      // Handle other types of errors with a different template or error page
+      // other types of errors with a different template or error page
       res.render('error', { error });
   }
 });
 
 // Global error handler
 app.use((err, req, res, next) => {
-  // Set the status to 500 if it's not already set
+  //  status
   err.status = err.status || 500;
 
-  // Set a default user-friendly message if it's not already set
+  // default user-friendly message 
   err.message = err.message || "Oops! Something went wrong on the server.";
 
-  // Log the error status and message to the console
+  //  the error status and message to the console
   console.error(`Error Status: ${err.status}, Message: ${err.message}`);
 
   // Render the error template and pass the error object
@@ -64,10 +67,10 @@ app.get('/', (req, res) => {
 // book Route
 app.get('/books', async (req, res) => {
   try {
-      const books = await Book.findAll(); // Assuming you have a Book model
+      const books = await Book.findAll(); 
       res.render('index', { books });
   } catch (error) {
-      next(error); // Pass to global error handler
+      next(error);
   }
 });
 //New Book Route
@@ -77,12 +80,21 @@ app.get('/books/new', (req, res) => {
 // Post a new book to the database
 app.post('/books/new', async (req, res, next) => {
   try {
-      await Book.create(req.body); // Assumes a `Book` model exists
+      await Book.create(req.body);
       res.redirect('/books');
   } catch (error) {
-      next(error);
+      if (error.name === 'SequelizeValidationError') {
+          // Render the form with validation error messages
+          res.render('new-book', {
+              errors: error.errors,
+              book: req.body // Keep the form data so the user doesn’t lose input
+          });
+      } else {
+          next(error);
+      }
   }
 });
+
 //Book detail Route
 app.get('/books/:id', async (req, res, next) => {
   try {
@@ -107,9 +119,17 @@ app.post('/books/:id', async (req, res, next) => {
           res.status(404).render('page-not-found');
       }
   } catch (error) {
-      next(error);
+      if (error.name === 'SequelizeValidationError') {
+          res.render('update-book', {
+              errors: error.errors,
+              book: { ...req.body, id: req.params.id } // Keep form data
+          });
+      } else {
+          next(error);
+      }
   }
 });
+
 //Delete Book Route
 app.post('/books/:id/delete', async (req, res, next) => {
   try {
@@ -125,11 +145,8 @@ app.post('/books/:id/delete', async (req, res, next) => {
   }
 });
 //Form error 
-
-
 app.post('/submit-form',async (req, res, next) => {
   try {
-    // Create a new book instance
     const book = await Book.create({ title, author });
     // Redirect to the books listing page if successful
     res.redirect('/books');

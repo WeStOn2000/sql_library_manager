@@ -1,9 +1,8 @@
 'use strict';
 
-const sequelize = require('../models');
-const {
-  Model
-} = require('sequelize');
+const { Model, DataTypes } = require('sequelize');  // Import Model and DataTypes
+const sequelize = require('../config/db');  // Import the configured sequelize instance
+
 module.exports = (sequelize, DataTypes) => {
   class Book extends Model {
     /**
@@ -15,43 +14,50 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  Book.init({
-    title:{ 
-     type: DataTypes.STRING,
-     allowNull: false,
-    validate:{
-      notEmpty:{
-        msg: "title cannot be empty"
-      }
+
+  // Initialize the Book model
+  Book.init(
+    {
+      title: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: "Title cannot be empty",
+          },
+        },
+      },
+      author: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: "Author cannot be empty",
+          },
+        },
+      },
+      genre: {
+        type: DataTypes.STRING,
+        validate: {
+          notEmpty: {
+            msg: "Genre cannot be empty",
+          },
+        },
+      },
+      year: {
+        type: DataTypes.INTEGER,
+        validate: {
+          notEmpty: {
+            msg: "Year cannot be empty",
+          },
+        },
+      },
+    },
+    {
+      sequelize,  // Only pass the sequelize instance here
+      modelName: 'Book',  // Set the model name
     }
-    },
-    author:{
-      type: DataTypes.STRING,
-      allowNull: false, // Prevent null values
-      validate: {
-        notEmpty: {
-          msg: "Author cannot be empty." // Custom error message if empty
-        }
-      }
-    },
-    genre:{ 
-      type: DataTypes.STRING,
-      validate: {
-        notEmpty: {
-          msg: "genre cannot be empty." // Custom error message if empty
-        }
-    }
-  },
-    year: { 
-      type: DataTypes.INTEGER, 
-      validate: {
-        notEmpty: {
-          msg: "Year cannot be empty." // Custom error message if empty
-        }
-      }
-    },
-    sequelize,
-    modelName: 'Book',
-  });
+  );
+
   return Book;
 };

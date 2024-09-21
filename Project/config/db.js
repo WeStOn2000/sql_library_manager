@@ -2,7 +2,7 @@ const { Sequelize } = require('sequelize');
 
 const sequelize = new Sequelize('database', 'username', 'password', {
     host: 'localhost',
-    dialect: 'sqlite' // Adjust to your database type
+    dialect: 'sqlite' 
 });
 
 (async () => {
