@@ -30,33 +30,32 @@ app.use('/users', usersRouter);
 app.use((req, res, next) => {
   const error = new Error("Page not found");
   error.status = 404;
-  next(error); 
+  next(error);
 });
 
 // Error-handling middleware
 app.use((error, req, res, next) => {
   res.status(error.status || 500);
-  //passing the error message
+
   if (error.status === 404) {
-      res.render('page-not-found', { error });
+    res.render('page-not-found', { error });
   } else {
-      // other types of errors with a different template or error page
-      res.render('error', { error });
+
+    res.render('error', { error });
   }
 });
 
 // Global error handler
 app.use((err, req, res, next) => {
-  //  status
+
   err.status = err.status || 500;
 
-  // default user-friendly message 
+
   err.message = err.message || "Oops! Something went wrong on the server.";
 
-  //  the error status and message to the console
   console.error(`Error Status: ${err.status}, Message: ${err.message}`);
 
-  // Render the error template and pass the error object
+
   res.status(err.status);
   res.render('error', { err });
 });
@@ -67,10 +66,10 @@ app.get('/', (req, res) => {
 // book Route
 app.get('/books', async (req, res) => {
   try {
-      const books = await Book.findAll(); 
-      res.render('index', { books });
+    const books = await Book.findAll();
+    res.render('index', { books });
   } catch (error) {
-      next(error);
+    next(error);
   }
 });
 //New Book Route
@@ -80,83 +79,83 @@ app.get('/books/new', (req, res) => {
 // Post a new book to the database
 app.post('/books/new', async (req, res, next) => {
   try {
-      await Book.create(req.body);
-      res.redirect('/books');
+    await Book.create(req.body);
+    res.redirect('/books');
   } catch (error) {
-      if (error.name === 'SequelizeValidationError') {
-          // Render the form with validation error messages
-          res.render('new-book', {
-              errors: error.errors,
-              book: req.body // Keep the form data so the user doesn’t lose input
-          });
-      } else {
-          next(error);
-      }
+    if (error.name === 'SequelizeValidationError') {
+
+      res.render('new-book', {
+        errors: error.errors,
+        book: req.body
+      });
+    } else {
+      next(error);
+    }
   }
 });
 
 //Book detail Route
 app.get('/books/:id', async (req, res, next) => {
   try {
-      const book = await Book.findByPk(req.params.id);
-      if (book) {
-          res.render('update-book', { book });
-      } else {
-          res.status(404).render('page-not-found');
-      }
+    const book = await Book.findByPk(req.params.id);
+    if (book) {
+      res.render('update-book', { book });
+    } else {
+      res.status(404).render('page-not-found');
+    }
   } catch (error) {
-      next(error);
+    next(error);
   }
 });
 //Update book route
 app.post('/books/:id', async (req, res, next) => {
   try {
-      const book = await Book.findByPk(req.params.id);
-      if (book) {
-          await book.update(req.body);
-          res.redirect('/books');
-      } else {
-          res.status(404).render('page-not-found');
-      }
+    const book = await Book.findByPk(req.params.id);
+    if (book) {
+      await book.update(req.body);
+      res.redirect('/books');
+    } else {
+      res.status(404).render('page-not-found');
+    }
   } catch (error) {
-      if (error.name === 'SequelizeValidationError') {
-          res.render('update-book', {
-              errors: error.errors,
-              book: { ...req.body, id: req.params.id } 
-          });
-      } else {
-          next(error);
-      }
+    if (error.name === 'SequelizeValidationError') {
+      res.render('update-book', {
+        errors: error.errors,
+        book: { ...req.body, id: req.params.id }
+      });
+    } else {
+      next(error);
+    }
   }
 });
 
 //Delete Book Route
 app.post('/books/:id/delete', async (req, res, next) => {
   try {
-      const book = await Book.findByPk(req.params.id);
-      if (book) {
-          await book.destroy();
-          res.redirect('/books');
-      } else {
-          res.status(404).render('page-not-found');
-      }
+    const book = await Book.findByPk(req.params.id);
+    if (book) {
+      await book.destroy();
+      res.redirect('/books');
+    } else {
+      res.status(404).render('page-not-found');
+    }
   } catch (error) {
-      next(error);
+    next(error);
   }
 });
 //Form error 
-app.post('/submit-form',async (req, res, next) => {
+app.post('/submit-form', async (req, res, next) => {
   try {
     const book = await Book.create({ title, author });
-    
+
     res.redirect('/books');
   } catch (error) {
 
     if (error.name === 'SequelizeValidationError') {
       const errors = error.errors.map(err => err.message);
-      res.render('form-error', { errors }); 
+      res.render('form-error', { errors });
     } else {
-    
+
       res.status(500).send('Server Error');
     }
   }
