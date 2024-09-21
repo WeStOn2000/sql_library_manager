@@ -36,7 +36,7 @@ Object.keys(db).forEach(modelName => {
     db[modelName].associate(db);
   }
 });
-
+//connecting the database
 (async () => {
     try {
         await sequelize.authenticate();
@@ -48,8 +48,6 @@ Object.keys(db).forEach(modelName => {
         console.error('Unable to connect to the database:', error);
     }
 })();
-
-module.exports = sequelize;
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
