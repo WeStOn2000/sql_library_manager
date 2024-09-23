@@ -3,7 +3,8 @@ var path = require('path');
 const db = require('./models/index');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const {book} = require('./models');
+const { Book } = require('./models');
+
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -22,6 +23,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+
+db.sequelize.sync().then(() => {
+  console.log('Database synced');
+}).catch(err => {
+  console.error('Error syncing database:', err);
+});
+
 
 // Error-handling middleware
 app.use((error, req, res, next) => {
