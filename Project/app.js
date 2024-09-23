@@ -3,7 +3,7 @@ var path = require('path');
 const db = require('./models/index');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const book = require('./models/book');
+const {book} = require('./models');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -22,16 +22,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-
-
-
-
-// Handle 404 errors and render the 'page-not-found' template
-app.use((req, res, next) => {
-  const error = new Error("Page not found");
-  error.status = 404;
-  next(error);
-});
 
 // Error-handling middleware
 app.use((error, req, res, next) => {
