@@ -1,105 +1,92 @@
-var express = require('express');
-var path = require('path');
-const db = require('./models/index');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-const { Book } = require('./models');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const createError = require('http-errors');
+const { sequelize, Book } = require('./models');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const app = express();
 
-var app = express();
-
-// view engine setup
+// View engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+// Middleware
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+// Routes
 
-// 404 Error Handler
-app.use((req, res, next) => {
-  const error = new Error("Page Not Found");
-  error.status = 404;
-  next(error);
-});
-
-// Error-handling middleware
-app.use((error, req, res, next) => {
-  res.status(error.status || 500);
-  res.render(error.status === 404 ? 'page-not-found' : 'error', { error });
-  next()
-});
-
-db.sequelize.sync().then(() => {
-  console.log('Database synced');
-}).catch(err => {
-  console.error('Error syncing database:', err);
-});
-
-// Home route
+// Home route - redirect to books
 app.get('/', (req, res) => {
   res.redirect('/books');
 });
 
-// Book routes
+// Books listing route
 app.get('/books', async (req, res, next) => {
   try {
     const books = await Book.findAll();
-    res.render('index', { books });
+    res.render('index', { books, title: 'Books' });
   } catch (error) {
     next(error);
   }
 });
-//New Book Route
+
+// New book form route
 app.get('/books/new', (req, res) => {
-  res.render('new-book');
+  res.render('new-book', { title: 'New Book' });
 });
-// Post a new book to the database
+
+// Create new book route
 app.post('/books/new', async (req, res, next) => {
   try {
     await Book.create(req.body);
     res.redirect('/books');
   } catch (error) {
     if (error.name === 'SequelizeValidationError') {
-      res.render('new-book', { errors: error.errors, book: req.body });
+      res.render('new-book', { 
+        title: 'New Book',
+        errors: error.errors,
+        book: req.body 
+      });
     } else {
       next(error);
     }
   }
 });
-//Book detail Route
+
+// Book detail route
 app.get('/books/:id', async (req, res, next) => {
   try {
-    const book = await Book.findByPk(req.params.id);
+    const book = await Book.findByPk(req.params.id);  
     if (book) {
-      res.render('update-book', { book });
+      res.render('update-book', { book }); 
     } else {
-      res.status(404).render('page-not-found');
+      next(createError(404, 'Book not found'));
     }
   } catch (error) {
     next(error);
   }
 });
-//Update book route
+
+
+// Update book route
 app.post('/books/:id', async (req, res, next) => {
   try {
-    const book = await Book.findByPk(req.params.id);
+    const book = await Book.findByPk(req.params.id);  
     if (book) {
-      await book.update(req.body);
-      res.redirect('/books');
+      await book.update(req.body);  
+      res.redirect('/books');  
     } else {
-      res.status(404).render('page-not-found');
+      next(createError(404, 'Book not found'));
     }
   } catch (error) {
     if (error.name === 'SequelizeValidationError') {
       res.render('update-book', {
+        title: 'Update Book',
         errors: error.errors,
         book: { ...req.body, id: req.params.id }
       });
@@ -108,36 +95,48 @@ app.post('/books/:id', async (req, res, next) => {
     }
   }
 });
-//Delete Book Route
+
+
+// Delete book route
 app.post('/books/:id/delete', async (req, res, next) => {
   try {
     const book = await Book.findByPk(req.params.id);
     if (book) {
-      await book.destroy();
+      await book.destroy();  
       res.redirect('/books');
     } else {
-      res.status(404).render('page-not-found');
+      next(createError(404, 'Book not found'));
     }
   } catch (error) {
     next(error);
   }
 });
-//Form error
-app.post('/submit-form', async (req, res, next) => {
-  try {
-    const { title, author } = req.body;  // Get form fields from req.body
-    const book = await Book.create({ title, author });
-    res.redirect('/books');
-  } catch (error) {
-    if (error.name === 'SequelizeValidationError') {
-      const errors = error.errors.map(err => err.message);
-      res.render('form-error', { errors });
-    } else {
-      res.status(500).send('Server Error');
-    }
-  }
-  next(error)
+
+
+// 404 Error Handler
+app.use('*', (req, res, next) => {
+  next(createError(404, 'Page Not Found'));
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res.locals.title = err.status === 404 ? 'Page Not Found' : 'Error';
+  res.locals.url = req.originalUrl;
+
+  // status and render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+
+// Sync database and start server
+sequelize.sync().then(() => {
+  console.log('Database synced');
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => console.log(`Server running on port ${port}`));
+}).catch(err => {
+  console.error('Error syncing database:', err);
 });
 
 module.exports = app;
-
