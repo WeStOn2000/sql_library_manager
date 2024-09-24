@@ -1,9 +1,11 @@
-doctype html
-html
-  head
-    title Server Error
-    link(rel="stylesheet", href="/stylesheets/style.css")
-  body
-    h1 Server Error
-    p Sorry! There was an unexpected error on the server.
+extends layout
+
+block content
+  h1 Error
+  p Something went wrong.
+  if error.message
+    p= error.message
+  if error.status
+    p Status code: #{error.status}
+
 

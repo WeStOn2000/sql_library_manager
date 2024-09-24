@@ -2,15 +2,21 @@ extends layout
 
 block content
   h1 Edit Book Details
+
   if errors
     ul
       each error in errors
         li.error= error.message
+
   form(action=`/books/${book.id}` method="POST")
-    div
-      label(for="title") Title
-      input(type="text" name="title" id="title" value=book?.title)
-    div
-      label(for="author") Author
-      input(type="text" name="author" id="author" value=book?.author)
-    button(type="submit") Update Book
+    .form-group
+      div
+        label(for="title") Title
+        input(type="text" name="title" id="title" value=(book ? book.title : '') class="form-control")
+    .form-group
+      div
+        label(for="author") Author
+        input(type="text" name="author" id="author" value=(book ? book.author : '') class="form-control")
+    button(type="submit" class="btn btn-primary") Update Book
+
+

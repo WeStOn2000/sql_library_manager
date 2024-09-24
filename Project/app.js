@@ -43,11 +43,11 @@ app.get('/books', async (req, res, next) => {
     next(error);
   }
 });
-
+//New Book Route
 app.get('/books/new', (req, res) => {
   res.render('new-book');
 });
-
+// Post a new book to the database
 app.post('/books/new', async (req, res, next) => {
   try {
     await Book.create(req.body);
@@ -60,7 +60,7 @@ app.post('/books/new', async (req, res, next) => {
     }
   }
 });
-
+//Book detail Route
 app.get('/books/:id', async (req, res, next) => {
   try {
     const book = await Book.findByPk(req.params.id);
@@ -73,7 +73,7 @@ app.get('/books/:id', async (req, res, next) => {
     next(error);
   }
 });
-
+//Update book route
 app.post('/books/:id', async (req, res, next) => {
   try {
     const book = await Book.findByPk(req.params.id);
@@ -94,7 +94,7 @@ app.post('/books/:id', async (req, res, next) => {
     }
   }
 });
-
+//Delete Book Route
 app.post('/books/:id/delete', async (req, res, next) => {
   try {
     const book = await Book.findByPk(req.params.id);
@@ -108,7 +108,7 @@ app.post('/books/:id/delete', async (req, res, next) => {
     next(error);
   }
 });
-
+//Form error
 app.post('/submit-form', async (req, res, next) => {
   try {
     const { title, author } = req.body;  // Get form fields from req.body

@@ -31,6 +31,7 @@ form a.button, input[type=submit] {
 
 input[type=submit] {
   border: 0;
+  margin-top: 15px;
 }
 
   a.button:hover, input[type=submit]:hover {
@@ -88,8 +89,14 @@ input {
 }
 
 input[type=text] {
-  margin-left: 7px;
-  width: 300px;
+  width: calc(100% - 150px); /* Responsive width based on label size */
+  max-width: 300px; /* Set a maximum width for better control */
+  padding: 10px;
+  font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  border-radius: 2px;
+  border-color: #E7E7E7;
+  transition: 0.4s;
 }
 
 .error {
