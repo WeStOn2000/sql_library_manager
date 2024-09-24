@@ -23,6 +23,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
+// 404 Error Handler
+app.use((req, res, next) => {
+  const error = new Error("Page Not Found");
+  error.status = 404;
+  next(error);
+});
+
+// Error-handling middleware
+app.use((error, req, res, next) => {
+  res.status(error.status || 500);
+  res.render(error.status === 404 ? 'page-not-found' : 'error', { error });
+  next()
+});
+
 db.sequelize.sync().then(() => {
   console.log('Database synced');
 }).catch(err => {
@@ -122,19 +136,7 @@ app.post('/submit-form', async (req, res, next) => {
       res.status(500).send('Server Error');
     }
   }
-});
-
-// 404 Error Handler
-app.use((req, res, next) => {
-  const error = new Error("Page Not Found");
-  error.status = 404;
-  next(error);
-});
-
-// Error-handling middleware
-app.use((error, req, res, next) => {
-  res.status(error.status || 500);
-  res.render(error.status === 404 ? 'page-not-found' : 'error', { error });
+  next(error)
 });
 
 module.exports = app;

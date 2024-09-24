@@ -1,11 +1,11 @@
-extends layout
+doctype html
+head
+  title Page Not Found
+  link(rel='stylesheet' href='../public/stylesheets/style.css')
+h1 Server Error
+p Sorry! There was an unexpected error on the server.
 
-block content
-  h1 Error
-  p Something went wrong.
-  if error.message
-    p= error.message
-  if error.status
-    p Status code: #{error.status}
+
+
 
 
