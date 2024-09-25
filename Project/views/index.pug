@@ -4,6 +4,12 @@ block content
   h1 Books
   p 
     a.button(href="/books/new") Create New Book
+
+  // Search form
+  form(action="/books", method="GET")
+    input(type="text" name="query" placeholder="Search by title, author, genre, or year")
+    input(type="submit" value="Search")
+
   if books && books.length > 0
     table
       thead
@@ -16,9 +22,19 @@ block content
         each book in books
           tr
             td 
-             a(href=`/books/${book.id}`)= book.title
+              a(href=`/books/${book.id}`)= book.title
             td= book.author
             td= book.genre
             td= book.year
+
+    // Pagination controls
+    if currentPage > 1
+      a(href=`/books?page=${currentPage - 1}&limit=10`) Previous
+
+    span Page #{currentPage} of #{totalPages}
+
+    if currentPage < totalPages
+      a(href=`/books?page=${currentPage + 1}&limit=10`) Next
+
   else
     p No books found in the database.

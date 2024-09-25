@@ -5,6 +5,7 @@ const logger = require('morgan');
 const createError = require('http-errors');
 const { sequelize, Book } = require('./models');
 const seedBooks = require('./seeders/seedBooks');
+const { Op } = require('sequelize');
 
 const app = express();
 
@@ -119,6 +120,57 @@ app.post('/books/:id/delete', async (req, res, next) => {
       next(createError(404, 'Book not found'));
     }
   } catch (error) {
+    next(error);
+  }
+});
+
+//Search input  handling
+app.get('/books', async (req, res, next) => {
+  try {
+    const query = req.query.query;// Get the search from url
+    const page = parseInt(req.query.page) || 1;// current page number
+    const limit = parseInt(req.query.limit) || 10; // Number of books per page
+    const offset = (page - 1) * limit; // Calculate offset for pagination
+
+    console.log('Search Query:', query); // Log the search query
+    console.log('Page:', page); // Log the current page
+    console.log('Limit:', limit); // Log the limit
+
+    let books;
+    if (query) {
+      // Perform a search based on the query across multiple fields with pagination
+      books = await Book.findAll({
+        where: {
+          [Op.or]: [
+            { title: { [Op.like]: `%${query}%` } },
+            { author: { [Op.like]: `%${query}%` } },
+            { genre: { [Op.like]: `%${query}%` } },
+            { year: { [Op.like]: `%${query}%` } }
+          ]
+        },
+        limit: limit,
+        offset: offset,
+      });
+    } else {
+      // If no query is provided, fetch all books with pagination
+      books = await Book.findAll({
+        limit: limit,
+        offset: offset,
+      });
+    }
+
+    const totalBooks = await Book.count(); // Get total number of books for pagination
+
+    console.log('Books fetched:', books.length);
+    
+    res.render('index', { 
+      books, 
+      title: 'Books', 
+      currentPage: page, 
+      totalPages: Math.ceil(totalBooks / limit) // Calculate total pages
+    });
+  } catch (error) {
+    console.error('Error fetching books:', error);
     next(error);
   }
 });
