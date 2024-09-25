@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const createError = require('http-errors');
 const { sequelize, Book } = require('./models');
+const seedBooks = require('./seeders/seedBooks');
 
 const app = express();
 
@@ -29,9 +30,13 @@ app.get('/', (req, res) => {
 app.get('/books', async (req, res, next) => {
   try {
     const books = await Book.findAll();
-    console.log(books); 
+    console.log('Books fetched:', books.length);
+    if (books.length === 0) {
+      console.log('No books found in the database');
+    }
     res.render('index', { books, title: 'Books' });
   } catch (error) {
+    console.error('Error fetching books:', error);
     next(error);
   }
 });
@@ -42,17 +47,19 @@ app.get('/books/new', (req, res) => {
 });
 
 // Create new book route
-// New book route (POST)
 app.post('/books/new', async (req, res, next) => {
+  console.log('Received form data:', req.body);  // Add this line
   try {
-    await Book.create(req.body);
-    res.redirect('/books');
+    const book = await Book.create(req.body);
+    console.log('New book created:', book.toJSON());  // Add this line
+    res.redirect("/books");
   } catch (error) {
+    console.error('Error creating book:', error);  // Add this line
     if (error.name === 'SequelizeValidationError') {
-      res.render('new-book', { 
-        title: 'New Book',
-        errors: error.errors,  
-        book: req.body         
+      res.render("new-book", {
+        book: req.body,
+        errors: error.errors,
+        title: "New Book"
       });
     } else {
       next(error);
@@ -65,6 +72,7 @@ app.post('/books/new', async (req, res, next) => {
 app.get('/books/:id', async (req, res, next) => {
   try {
     const book = await Book.findByPk(req.params.id);  
+    console.log('Requested Book ID:', req.params.id); // Log the requested ID
     if (book) {
       res.render('update-book', { book, title: 'Update Book' }); 
     } else {
@@ -117,29 +125,42 @@ app.post('/books/:id/delete', async (req, res, next) => {
 
 
 // 404 Error Handler
-app.use('*', (req, res, next) => {
+app.use((req, res, next) => {
   next(createError(404, 'Page Not Found'));
 });
 
 // Global Error Handler
-app.use((err, req, res, next) => {
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-  res.locals.title = err.status === 404 ? 'Page Not Found' : 'Error';
-  res.locals.url = req.originalUrl;
+app.use((error, req, res, next) => {
+  console.log('Error status:', error.status);
+  console.log('Error message:', error.message);
 
-  // status and render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  res.locals.message = error.message;
+  res.locals.error = req.app.get('env') === 'development' ? error : {};
+
+  res.status(error.status || 500);
+  
+  if (error.status === 404) {
+    console.log('Rendering page-not-found template');
+    res.render('page-not-found', { title: 'Page Not Found' });
+  } else {
+    console.log('Rendering error template');
+    res.render('error', { title: 'Server Error' });
+  }
 });
 
-// Sync database and start server
-sequelize.sync().then(() => {
-  console.log('Database synced');
-  const port = process.env.PORT || 3000;
-  app.listen(port, () => console.log(`Server running on port ${port}`));
-}).catch(err => {
-  console.error('Error syncing database:', err);
-});
+// Sync database, seed books, and start server
+sequelize.sync({ force: true })
+  .then(() => {
+    console.log('Database synced');
+    return seedBooks();
+  })
+  .then(() => {
+    console.log('Books seeded successfully');
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => console.log(`Server running on port ${port}`));
+  })
+  .catch(err => {
+    console.error('Error syncing database or seeding books:', err);
+  });
 
 module.exports = app;

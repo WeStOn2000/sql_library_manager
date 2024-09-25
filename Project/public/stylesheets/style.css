@@ -100,5 +100,26 @@ input[type=text] {
 }
 
 .error {
-  color: rgb(236, 15, 15);
+  color: red;
+}
+
+.error ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.new-book-form label {
+  display: block;
+  margin-top: 10px;
+}
+
+.new-book-form input[type="text"],
+.new-book-form input[type="number"] {
+  width: 100%;
+  padding: 5px;
+  margin-top: 5px;
+}
+
+.new-book-form input[type="submit"] {
+  margin-top: 20px;
 }

@@ -9,19 +9,19 @@ block content
       each error in errors
         li= error.message
   
-  form(action="/books/new" method="post")
+  form.new-book-form(action="/books/new" method="post")
     p
       label(for='title') Title
-      input#title(name='title' type='text' value=(book && book.title) ? book.title : '')
+      input#title(name='title' type='text' value=(book && book.title) ? book.title : '' required)
     p
       label(for='author') Author
-      input#author(name='author' type='text' value=(book && book.author) ? book.author : '')
+      input#author(name='author' type='text' value=(book && book.author) ? book.author : '' required)
     p
       label(for='genre') Genre
       input#genre(name='genre' type='text' value=(book && book.genre) ? book.genre : '')
     p
       label(for='year') Year
-      input#year(name='year' type='text' value=(book && book.year) ? book.year : '')
+      input#year(name='year' type='number' min="1000" max="9999" value=(book && book.year) ? book.year : '' required)
     p
       input(type='submit' value='Create New Book')
     p

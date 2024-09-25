@@ -2,35 +2,27 @@ extends layout
 
 block content
   h1 New Book
-
-  // Debugging: Display raw errors object to see if it's passed correctly
+  
   if errors
-    h2 Error details:
-    pre= JSON.stringify(errors, null, 2) // Show errors object for debugging
-
-  // Display error messages, if any
-  if errors
-    ul.errors
+    h2.error Oooops! Something went wrong.
+    ul.error
       each error in errors
         li= error.message
-
-  form(action="/books/new" method="POST")
+  
+  form.new-book-form(action="/books/new" method="POST")
     p
       label(for='title') Title
-      input#title(name='title' type='text' value=book.title)
+      input#title(name='title' type='text' value=(book && book.title) ? book.title : '')
     p
       label(for='author') Author
-      input#author(name='author' type='text' value=book.author)
+      input#author(name='author' type='text' value=(book && book.author) ? book.author : '')
     p
       label(for='genre') Genre
-      input#genre(name='genre' type='text' value=book.genre)
+      input#genre(name='genre' type='text' value=(book && book.genre) ? book.genre : '')
     p
       label(for='year') Year
-      input#year(name='year' type='text' value=book.year)
+      input#year(name='year' type='text' value=(book && book.year) ? book.year : '')
     p
       input(type='submit' value='Create New Book')
-
     p
       a.button(href='/books') Cancel
-
-

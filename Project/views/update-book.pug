@@ -1,27 +1,33 @@
 extends layout
 
 block content
- h1 Update Book
- form(action=`/books/${book.id}` method="POST")
-  p
-    label(for='title') Title
-    input#title(name='title' type='text' value='The Hunger Games')
-  p
-    label(for='author') Author
-    input#author(name='author' type='text' value='Suzanne Collins')
-  p
-    label(for='genre') Genre
-    input#genre(name='genre' type='text' value='Fantasy')
-  p
-    label(for='year') Year
-    input#year(name='year' type='text' value='2008')
-  p
-    input(type='submit' value='Update Book')
-  p
-    a.button(href='/books') Cancel
-  p
-   form(action=`/books/${book.id}/delete` method="POST") 
+  h1 Update Book
+  
+  if errors
+    h2.error Oooops! Something went wrong.
+    ul.error
+      each error in errors
+        li= error.message
+  
+  form(action=`/books/${book.id}` method="POST")
+    p
+      label(for='title') Title
+      input#title(name='title' type='text' value=(book && book.title) ? book.title : '' required)
+    p
+      label(for='author') Author
+      input#author(name='author' type='text' value=(book && book.author) ? book.author : '' required)
+    p
+      label(for='genre') Genre
+      input#genre(name='genre' type='text' value=(book && book.genre) ? book.genre : '')
+    p
+      label(for='year') Year
+      input#year(name='year' type='number' min="1000" max="9999" value=(book && book.year) ? book.year : '' required)
+    p
+      input(type='submit' value='Update Book')
+  
+    p
+      a.button(href='/books') Cancel
+    
+  // Delete Form 
+  form(action=`/books/${book.id}/delete` method="POST") 
     input(type='submit' value='Delete Book')
-
-
-
