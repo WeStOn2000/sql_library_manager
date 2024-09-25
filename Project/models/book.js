@@ -1,19 +1,14 @@
 'use strict';
 
 const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../models/index.js'); 
 
 module.exports = (sequelize, DataTypes) => {
   class Book extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
       // define association here
     }
   }
+
   Book.init(
     {
       title: {
@@ -36,17 +31,21 @@ module.exports = (sequelize, DataTypes) => {
       },
       genre: {
         type: DataTypes.STRING,
-        validate: {
-          notEmpty: {
-            msg: "Genre cannot be empty",
-          },
-        },
+       
       },
       year: {
         type: DataTypes.INTEGER,
         validate: {
-          notEmpty: {
-            msg: "Year cannot be empty",
+          isInt: {
+            msg: "Year must be an integer",
+          },
+          min: {
+            args: [1000],
+            msg: "Year must be after 1000",
+          },
+          max: {
+            args: [new Date().getFullYear()],
+            msg: `Year cannot be in the future`,
           },
         },
       },
@@ -59,3 +58,4 @@ module.exports = (sequelize, DataTypes) => {
 
   return Book;
 };
+

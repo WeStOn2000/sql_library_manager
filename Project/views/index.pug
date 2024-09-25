@@ -1,105 +1,21 @@
 extends layout
 
 block content
-    h1 Books
-    p 
-      a.button(href="/books/new") Create New Book
-    table
-      thead
-        tr
-          th Title
-          th Author
-          th Genre
-          th Year
-      tbody
-        tr
-          td 
-            a(href="/books/:id") The Hunger Games
-          td Suzanne Collins
-          td Fantasy
-          td 2008
+  h1 Books
+  p 
+    a.button(href="/books/new") Create New Book
+  table
+    thead
+      tr
+        th Title
+        th Author
+        th Genre
+        th Year
+    tbody
+      each book in books
         tr
           td 
-            a(href="/books/:id") Catching Fire
-          td Suzanne Collins
-          td Fantasy
-          td 2009
-        tr
-          td 
-            a(href="/books/:id") Mockingjay
-          td Suzanne Collins
-          td Fantasy
-          td 2010
-        tr
-          td 
-            a(href="/books/:id") The Ballad of Songbirds and Snakes
-          td Suzanne Collins
-          td Fantasy
-          td 2020
-        tr
-          td 
-            a(href="/books/:id") The Memory Police
-          td Yoko Ogawa
-          td Science Fiction
-          td 1994
-        tr
-          td 
-            a(href="/books/:id") Nickel Boys
-          td Colson Whitehead
-          td Historical Fiction
-          td 2019
-        tr
-          td 
-            a(href="/books/:id") The Book of Unknown Americans
-          td Cristina Henriquez
-          td Fiction
-          td 2014
-        tr
-          td 
-            a(href="/books/:id") A Brief History of Time
-          td Stephen Hawking
-          td Non Fiction
-          td 1988
-        tr
-          td 
-            a(href="/books/:id") Armada
-          td Ernest Cline
-          td Science Fiction
-          td 2015
-        tr
-          td 
-            a(href="/books/:id") Emma
-          td Jane Austen
-          td Classic
-          td 1815
-        tr
-          td 
-            a(href="/books/:id") Frankenstein
-          td Mary Shelley
-          td Horror
-          td 1818
-        tr
-          td 
-            a(href="/books/:id") Pride and Prejudice
-          td Jane Austen
-          td Classic
-          td 1813
-        tr
-          td 
-            a(href="/books/:id") Ready Player One
-          td Ernest Cline
-          td Science Fiction
-          td 2011
-        tr
-          td 
-            a(href="/books/:id") The Martian
-          td Andy Weir
-          td Science Fiction
-          td 2014
-        tr
-          td 
-            a(href="/books/:id") The Universe in a Nutshell
-          td Stephen Hawking
-          td Non Fiction
-          td 2001
-
+            a(href="/books/" + book.id) #{book.title}
+          td #{book.author}
+          td #{book.genre}
+          td #{book.year}

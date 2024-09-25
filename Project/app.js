@@ -29,6 +29,7 @@ app.get('/', (req, res) => {
 app.get('/books', async (req, res, next) => {
   try {
     const books = await Book.findAll();
+    console.log(books); 
     res.render('index', { books, title: 'Books' });
   } catch (error) {
     next(error);
@@ -41,6 +42,7 @@ app.get('/books/new', (req, res) => {
 });
 
 // Create new book route
+// New book route (POST)
 app.post('/books/new', async (req, res, next) => {
   try {
     await Book.create(req.body);
@@ -49,8 +51,8 @@ app.post('/books/new', async (req, res, next) => {
     if (error.name === 'SequelizeValidationError') {
       res.render('new-book', { 
         title: 'New Book',
-        errors: error.errors,
-        book: req.body 
+        errors: error.errors,  
+        book: req.body         
       });
     } else {
       next(error);
@@ -58,12 +60,13 @@ app.post('/books/new', async (req, res, next) => {
   }
 });
 
+
 // Book detail route
 app.get('/books/:id', async (req, res, next) => {
   try {
     const book = await Book.findByPk(req.params.id);  
     if (book) {
-      res.render('update-book', { book }); 
+      res.render('update-book', { book, title: 'Update Book' }); 
     } else {
       next(createError(404, 'Book not found'));
     }
