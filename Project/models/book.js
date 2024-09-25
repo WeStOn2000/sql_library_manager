@@ -1,15 +1,14 @@
 'use strict';
 
 const { Model, DataTypes } = require('sequelize');
-
+// Export the Book model definition
 module.exports = (sequelize, DataTypes) => {
   class Book extends Model {
     static associate(models) {
-      // define association here
     }
   }
-
-  Book.init(
+  // Initialize the Book model
+Book.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -56,8 +55,8 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
-      sequelize, 
-      modelName: 'Book', 
+      sequelize, //the Sequelize instance to associate with this model
+      modelName: 'Book', // Name of the model in Sequelize; used for table creation and associations
     }
   );
 

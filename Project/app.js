@@ -3,6 +3,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const createError = require('http-errors');
+//Importing the following for the project
 const { sequelize, Book } = require('./models');
 const seedBooks = require('./seeders/seedBooks');
 const { Op } = require('sequelize');
