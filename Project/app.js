@@ -50,13 +50,13 @@ app.get('/books/new', (req, res) => {
 
 // Create new book route
 app.post('/books/new', async (req, res, next) => {
-  console.log('Received form data:', req.body);  // Add this line
+  console.log('Received form data:', req.body); 
   try {
     const book = await Book.create(req.body);
-    console.log('New book created:', book.toJSON());  // Add this line
+    console.log('New book created:', book.toJSON()); 
     res.redirect("/books");
   } catch (error) {
-    console.error('Error creating book:', error);  // Add this line
+    console.error('Error creating book:', error);  
     if (error.name === 'SequelizeValidationError') {
       res.render("new-book", {
         book: req.body,
@@ -74,7 +74,7 @@ app.post('/books/new', async (req, res, next) => {
 app.get('/books/:id', async (req, res, next) => {
   try {
     const book = await Book.findByPk(req.params.id);  
-    console.log('Requested Book ID:', req.params.id); // Log the requested ID
+    console.log('Requested Book ID:', req.params.id); 
     if (book) {
       res.render('update-book', { book, title: 'Update Book' }); 
     } else {
@@ -128,18 +128,17 @@ app.post('/books/:id/delete', async (req, res, next) => {
 //Search input  handling
 app.get('/books', async (req, res, next) => {
   try {
-    const query = req.query.query;// Get the search from url
-    const page = parseInt(req.query.page) || 1;// current page number
-    const limit = parseInt(req.query.limit) || 10; // Number of books per page
-    const offset = (page - 1) * limit; // Calculate offset for pagination
+    const query = req.query.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10; 
+    const offset = (page - 1) * limit; 
 
-    console.log('Search Query:', query); // Log the search query
-    console.log('Page:', page); // Log the current page
-    console.log('Limit:', limit); // Log the limit
+    console.log('Search Query:', query); 
+    console.log('Page:', page); 
+    console.log('Limit:', limit);
 
     let books;
     if (query) {
-      // Perform a search based on the query across multiple fields with pagination
       books = await Book.findAll({
         where: {
           [Op.or]: [
@@ -153,14 +152,13 @@ app.get('/books', async (req, res, next) => {
         offset: offset,
       });
     } else {
-      // If no query is provided, fetch all books with pagination
       books = await Book.findAll({
         limit: limit,
         offset: offset,
       });
     }
 
-    const totalBooks = await Book.count(); // Get total number of books for pagination
+    const totalBooks = await Book.count(); 
 
     console.log('Books fetched:', books.length);
     
@@ -168,7 +166,7 @@ app.get('/books', async (req, res, next) => {
       books, 
       title: 'Books', 
       currentPage: page, 
-      totalPages: Math.ceil(totalBooks / limit) // Calculate total pages
+      totalPages: Math.ceil(totalBooks / limit)
     });
   } catch (error) {
     console.error('Error fetching books:', error);
