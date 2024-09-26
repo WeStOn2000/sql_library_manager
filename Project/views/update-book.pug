@@ -12,16 +12,16 @@ block content
   form(action=`/books/${book.id}` method="POST")
     p
       label(for='title') Title
-      input#title(name='title' type='text' value=(book && book.title) ? book.title : '' required)
+      input#title(name='title' type='text' value=book.title)
     p
       label(for='author') Author
-      input#author(name='author' type='text' value=(book && book.author) ? book.author : '' required)
+      input#author(name='author' type='text' value=book.author)
     p
       label(for='genre') Genre
-      input#genre(name='genre' type='text' value=(book && book.genre) ? book.genre : '')
+      input#genre(name='genre' type='text' value=book.genre)
     p
       label(for='year') Year
-      input#year(name='year' type='number' min="1000" max="9999" value=(book && book.year) ? book.year : '' required)
+      input#year(name='year' type='number' value=book.year)
     p
       input(type='submit' value='Update Book')
   
@@ -29,5 +29,5 @@ block content
       a.button(href='/books') Cancel
     
   // Delete Form 
-  form(action=`/books/${book.id}/delete` method="POST") 
+  form(action=`/books/${book.id}/delete` method="POST" onsubmit="return confirm('Are you sure you want to delete this book?');") 
     input(type='submit' value='Delete Book')

@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const { body, validationResult } = require('express-validator');
 const logger = require('morgan');
 const createError = require('http-errors');
 //Importing the following for the project
@@ -87,12 +88,29 @@ app.get('/books/:id', async (req, res, next) => {
 
 
 // Update book route
-app.post('/books/:id', async (req, res, next) => {
+app.post('/books/:id', [
+  body('title').trim().notEmpty().withMessage('Title is required'),
+  body('author').trim().notEmpty().withMessage('Author is required'),
+], async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.render("update-book", {
+      book: { ...req.body, id: req.params.id },
+      errors: errors.array(),
+      title: "Update Book"
+    });
+  }
+
   try {
-    const book = await Book.findByPk(req.params.id);  
+    const book = await Book.findByPk(req.params.id);
     if (book) {
-      await book.update(req.body);  
-      res.redirect('/books');  
+      await book.update({
+        title: req.body.title,
+        author: req.body.author,
+        genre: req.body.genre,
+        year: req.body.year ? parseInt(req.body.year) : null
+      });
+      res.redirect('/books');
     } else {
       next(createError(404, 'Book not found'));
     }
@@ -100,7 +118,7 @@ app.post('/books/:id', async (req, res, next) => {
     if (error.name === 'SequelizeValidationError') {
       res.render('update-book', {
         title: 'Update Book',
-        errors: error.errors,
+        errors: error.errors.map(e => ({ message: e.message })),
         book: { ...req.body, id: req.params.id }
       });
     } else {
